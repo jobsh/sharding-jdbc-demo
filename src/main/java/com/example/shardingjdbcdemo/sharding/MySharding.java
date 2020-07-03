@@ -5,13 +5,12 @@ import org.apache.shardingsphere.api.sharding.standard.PreciseShardingValue;
 
 import java.util.Collection;
 
-public class MySharding implements PreciseShardingAlgorithm<String> {
+public class MySharding implements PreciseShardingAlgorithm<Long> {
     @Override
-    public String doSharding(Collection<String> availableTargetNames, PreciseShardingValue<String> shardingValue) {
-        // 使用UUID 这里需要是String
-        String id = shardingValue.getValue();
+    public String doSharding(Collection<String> availableTargetNames, PreciseShardingValue<Long> shardingValue) {
+        Long id = shardingValue.getValue();
 
-        long mode =id.hashCode() % availableTargetNames.size();
+        long mode =id % availableTargetNames.size();
         String[] strings = availableTargetNames.toArray(new String[0]);
         mode = Math.abs(mode);
 
