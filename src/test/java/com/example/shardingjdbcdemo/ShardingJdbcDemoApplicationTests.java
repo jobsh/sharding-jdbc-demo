@@ -28,10 +28,9 @@ public class ShardingJdbcDemoApplicationTests {
 //    @Transactional(propagation = Propagation.REQUIRED)
     public void testOrder() {
         Order order = new Order();
-        order.setUserId(15);
+        order.setUserId(14);
         order.setOrderStatus(1);
         order.setOrderAmount(10.0);
-        order.setOrderId(10);
         orderMapper.insertSelective(order);
 
         /*Order order2 = new Order();
@@ -47,7 +46,7 @@ public class ShardingJdbcDemoApplicationTests {
     @Test
     public void testSelectOrder(){
         OrderExample orderExample = new OrderExample();
-        orderExample.createCriteria().andOrderIdEqualTo(2);
+        orderExample.createCriteria().andOrderIdEqualTo("2");
         List<Order> orders = orderMapper.selectByExample(orderExample);
         orders.forEach(o-> System.out.println(o.getOrderId()+"----"+o.getUserId()));
     }
