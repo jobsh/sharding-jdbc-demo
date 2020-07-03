@@ -44,9 +44,14 @@
             </sharding:master-slave-rules>
             <sharding:table-rules>
                 <!-- t_order 表的逻辑名称，mapper.xml中对表的操作就写这个名称， sharding-jdbc中可以把分库和分表放在一起，填写各自的配置规则就可以了-->
-                <sharding:table-rule logic-table="t_order" actual-data-nodes="ms$->{0..1}.t_order$->{1..2}"
+                <!--<sharding:table-rule logic-table="t_order" actual-data-nodes="ms$->{0..1}.t_order$->{1..2}"
                                      database-strategy-ref="databaseStrategy" table-strategy-ref="tableStrategy"
-                                     />
+                                     />-->
+
+                <sharding:table-rule logic-table="t_order" actual-data-nodes="ms$->{0..1}.t_order$->{1..2}"
+                                     database-strategy-ref="databaseStrategy" table-strategy-ref="standard"
+                                     key-generator-ref="uuid"
+                />
             </sharding:table-rules>
           <!--  <sharding:broadcast-table-rules>
                 <sharding:broadcast-table-rule table="area"/>
@@ -55,9 +60,18 @@
         </sharding:sharding-rule>
     </sharding:data-source>
 
+    <!-- 1. 使用UUID生成分布式ID -->
+    <sharding:key-generator id="uuid" column="order_id" type="UUID"/>
     <!-- 使用雪花算法生成分布式ID -->
     <!--<sharding:key-generator id="snowflake" column="order_id" type="SNOWFLAKE" props-ref="snow"/>-->
-    
+
+    <!-- 自己实现的分片策略 注入进去-->
+    <bean id="myShard" class="com.example.shardingjdbcdemo.sharding.MySharding"/>
+
+    <sharding:standard-strategy id="standard" sharding-column="order_id" precise-algorithm-ref="myShard"/>
+
+
+
     <!--<bean:properties id="snow">
         <prop key="worker.id">678</prop>
         <prop key="max.tolerate.time.difference.milliseconds">10</prop>
@@ -66,11 +80,6 @@
     <!-- 配置数据库分片策略 -->
     <sharding:inline-strategy id="databaseStrategy" sharding-column="user_id"
                               algorithm-expression="ms$->{user_id % 2}" />
-
-    <!-- 自己实现的分片策略 注入进去-->
-    <!--<bean id="myShard" class="com.example.shardingjdbcdemo.sharding.MySharding"/>-->
-
-    <!--<sharding:standard-strategy id="standard" sharding-column="order_id" precise-algorithm-ref="myShard"/>-->
 
     <!-- 配置表分片策略 -->
     <sharding:inline-strategy id="tableStrategy" sharding-column="order_id"
